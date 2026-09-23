@@ -1,0 +1,43 @@
+{
+  "profile": {
+    "name": "TIGER TEAM",
+    "titlePrefix": "",
+    "bio": "Here you will find all the links and projects of Tiger Team.",
+    "avatar": "tiger-logo.jpg",
+    "status": "Online",
+    "pin": "2007"
+  },
+  "programs": [
+    {
+      "id": "prog-2",
+      "name": "Telegram",
+      "url": "https://t.me/Tiger_TE",
+      "icon": "fa-brands fa-telegram",
+      "color": "#a855f7",
+      "glow": "rgba(168, 85, 247, 0.4)",
+      "active": true
+    }
+  ],
+  "links": [
+    {
+      "id": "link-1",
+      "title": "steam hours tiger tool",
+      "url": "https://t9ger.vercel.app/",
+      "desc": "",
+      "icon": "fa-brands fa-steam",
+      "color": "#a855f7",
+      "glow": "rgba(168, 85, 247, 0.4)",
+      "active": true
+    },
+    {
+      "id": "link-2",
+      "title": "steam Achievement tiger tool",
+      "url": "https://t9ger.vercel.app/",
+      "desc": "",
+      "icon": "fa-brands fa-steam",
+      "color": "#f59e0b",
+      "glow": "rgba(245, 158, 11, 0.4)",
+      "active": true
+    }
+  ]
+}
