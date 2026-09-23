@@ -286,15 +286,36 @@ class CosmicApp {
     }
 
     async publishGlobal() {
-        const token = this.getGitHubToken();
-        if (!token) {
-            this.showToast('ضيف GitHub Token بالأول!', 'error');
-            return;
-        }
         const btn = document.getElementById('publishGlobalBtn');
         const oldText = btn ? btn.innerHTML : '';
         try {
             if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري النشر...'; }
+            // 1) حاول النشر عبر سيرفر Vercel (التوكن محفوظ هناك، ما تحتاج تدخله)
+            try {
+                const serverRes = await fetch('/api/publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: this.data, pin: this.data.profile.pin })
+                });
+                const serverJson = await serverRes.json().catch(() => ({}));
+                if (serverRes.ok && serverJson.ok) {
+                    this.updateSyncStatus('published');
+                    this.showToast('تم النشر للجميع! انتظر 1-2 دقيقة 🌍');
+                    return;
+                }
+                // اذا السيرفر بعده ما متضبط (NOT_CONFIGURED)، انزل للطريقة القديمة بالتوكن
+                if (serverJson.error !== 'NOT_CONFIGURED') {
+                    throw new Error(serverJson.error || ('فشل النشر (' + serverRes.status + ')'));
+                }
+            } catch (serverErr) {
+                // اذا الخطأ من السيرفر نفسه وما اكو توكن محلي، اعرضه
+                const tokenFallback = this.getGitHubToken();
+                if (!tokenFallback) throw serverErr;
+                // иначе كمّل للتوكن المحلي
+            }
+            // 2) طريقة احتياطية: توكن محفوظ بالمتصفح
+            const token = this.getGitHubToken();
+            if (!token) throw new Error('ضيف GITHUB_TOKEN في Vercel أو احفظ توكن بالمتصفح!');
             const apiUrl = `https://api.github.com/repos/${GLOBAL_SYNC.owner}/${GLOBAL_SYNC.repo}/contents/${GLOBAL_SYNC.file}`;
             // 1) جيب sha الملف الحالي
             const getRes = await fetch(apiUrl + `?ref=${GLOBAL_SYNC.branch}`, {
