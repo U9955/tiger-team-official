@@ -15,79 +15,37 @@ const DEFAULT_DATA = {
     },
     programs: [
         {
-            id: "prog-1",
-            name: "Photoshop",
-            url: "https://photoshop.adobe.com",
-            icon: "fa-solid fa-palette",
-            color: "#38bdf8",
-            glow: "rgba(56, 189, 248, 0.4)",
-            active: true
-        },
-        {
             id: "prog-2",
             name: "Telegram",
-            url: "https://web.telegram.org",
+            url: "https://t.me/Tiger_TE",
             icon: "fa-brands fa-telegram",
-            color: "#0284c7",
-            glow: "rgba(2, 132, 199, 0.4)",
-            active: true
-        },
-        {
-            id: "prog-3",
-            name: "ChatGPT",
-            url: "https://chatgpt.com",
-            icon: "fa-brands fa-openai",
-            color: "#10a37f",
-            glow: "rgba(16, 163, 127, 0.45)",
-            active: true
-        },
-        {
-            id: "prog-4",
-            name: "VS Code",
-            url: "https://vscode.dev",
-            icon: "fa-solid fa-code",
-            color: "#6366f1",
-            glow: "rgba(99, 102, 241, 0.4)",
-            active: true
-        },
-        {
-            id: "prog-5",
-            name: "Discord",
-            url: "https://discord.com",
-            icon: "fa-brands fa-discord",
-            color: "#8b5cf6",
-            glow: "rgba(139, 92, 246, 0.4)",
-            active: true
-        },
-        {
-            id: "prog-6",
-            name: "YouTube",
-            url: "https://youtube.com",
-            icon: "fa-brands fa-youtube",
-            color: "#ef4444",
-            glow: "rgba(239, 68, 68, 0.4)",
-            active: true
-        },
-        {
-            id: "prog-7",
-            name: "GitHub",
-            url: "https://github.com",
-            icon: "fa-brands fa-github",
-            color: "#f8fafc",
-            glow: "rgba(248, 250, 252, 0.35)",
-            active: true
-        },
-        {
-            id: "prog-8",
-            name: "Figma",
-            url: "https://figma.com",
-            icon: "fa-brands fa-figma",
-            color: "#ec4899",
-            glow: "rgba(236, 72, 153, 0.4)",
+            color: "#a855f7",
+            glow: "rgba(168, 85, 247, 0.4)",
             active: true
         }
     ],
-    links: [] // Completely clean & empty as requested by user
+    links: [
+        {
+            id: "link-1",
+            title: "steam hours tiger tool",
+            url: "https://t9ger.vercel.app/",
+            desc: "",
+            icon: "fa-brands fa-steam",
+            color: "#a855f7",
+            glow: "rgba(168, 85, 247, 0.4)",
+            active: true
+        },
+        {
+            id: "link-2",
+            title: "steam Achievement tiger tool",
+            url: "https://t9ger.vercel.app/",
+            desc: "",
+            icon: "fa-brands fa-steam",
+            color: "#f59e0b",
+            glow: "rgba(245, 158, 11, 0.4)",
+            active: true
+        }
+    ]
 };
 
 // Official ChatGPT / OpenAI Vector SVG Icon
@@ -176,7 +134,7 @@ const COLOR_PRESETS = [
 // Main Application Controller
 class CosmicApp {
     constructor() {
-        this.STORAGE_KEY = 'COSMIC_PORTAL_EN_V9';
+        this.STORAGE_KEY = 'COSMIC_PORTAL_EN_V12';
         this.data = this.loadData();
 
         // State variables
@@ -196,7 +154,7 @@ class CosmicApp {
     // Load Data from LocalStorage with auto-migration
     loadData() {
         try {
-            const saved = localStorage.getItem(this.STORAGE_KEY) || localStorage.getItem('COSMIC_PORTAL_EN_V8') || localStorage.getItem('COSMIC_PORTAL_EN_V7') || localStorage.getItem('COSMIC_PORTAL_EN_V6') || localStorage.getItem('COSMIC_PORTAL_EN_V5') || localStorage.getItem('COSMIC_PORTAL_EN_V4');
+            const saved = localStorage.getItem(this.STORAGE_KEY);
             if (saved) {
                 const parsed = JSON.parse(saved);
                 // Ensure PIN is updated to user requested PIN
