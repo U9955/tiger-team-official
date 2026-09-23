@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Hub ✦ Space Portal</title>
+    <meta name="description" content="A serene, deep-space dashboard connecting all your software, web apps, and digital spaces with full admin control.">
+
+    <!-- Google Fonts: Montserrat, Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Space Stylesheet -->
+    <link rel="stylesheet" href="style.css?v=20260923_9">
+</head>
+<body>
+
+    <!-- Cosmic Background Audio -->
+    <audio id="bgMusic" src="space-music.mp3" preload="auto" loop></audio>
+
+
+    <!-- Interactive Canvas Cosmic Background -->
+    <canvas id="starsCanvas"></canvas>
+
+    <!-- Ambient Nebulae Glows -->
+    <div class="nebula-glow nebula-1"></div>
+    <div class="nebula-glow nebula-2"></div>
+
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+
+        <!-- Cosmic Profile Header -->
+        <header class="profile-header">
+            <!-- Avatar with Orbital Ring -->
+            <div class="avatar-container">
+                <div class="avatar-ring"></div>
+                <img id="profileAvatar" src="tiger-logo.jpg" alt="Tiger Team Logo" class="avatar-img">
+            </div>
+
+            <!-- Live Status Badge -->
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span id="statusBadgeText">Online</span>
+            </div>
+
+            <!-- Name & Title -->
+            <h1 class="profile-title" id="profileTitle">TIGER TEAM</h1>
+
+            <!-- Bio -->
+            <p class="profile-bio" id="profileBio">
+                Here you will find all the links and projects of Tiger Team.
+            </p>
+        </header>
+
+        <!-- Cosmic Apps & Software Dock -->
+        <section class="apps-section">
+            <div class="apps-dock" id="appsDock">
+                <!-- Dynamically populated via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Websites / Links Section (Shown only if custom links exist) -->
+        <section class="links-grid" id="linksGrid">
+            <!-- Dynamically populated or hidden if empty -->
+        </section>
+
+        <!-- Page Footer -->
+        <footer class="page-footer">
+            <div class="footer-controls">
+                <button type="button" class="footer-stars-toggle" id="footerStarsToggle">
+                    ✦ Pause Starfield
+                </button>
+                <button type="button" class="footer-sound-toggle" id="footerMusicToggle" title="Mute / Unmute Cosmic Audio" aria-label="Toggle Sound">
+                    <i class="fa-solid fa-volume-high" id="footerMusicIcon"></i>
+                </button>
+            </div>
+            <p>All Rights Reserved to <span class="footer-admin-link" id="footerAdminTrigger" onclick="triggerAdminAccess()" title="Admin Panel">Tiger Team</span> &copy; <span id="currentYear">2026</span></p>
+        </footer>
+
+    </main>
+
+    <!-- Floating Admin Action Button (Hidden, access is via footer Tiger Team) -->
+    <button type="button" class="admin-fab" id="adminFab" title="Open Admin Dashboard" style="display: none;">
+        <i class="fa-solid fa-gear"></i>
+        <span>Admin Panel</span>
+    </button>
+
+    <!-- Security PIN Verification Modal -->
+    <div class="admin-overlay" id="pinOverlay">
+        <div class="admin-modal pin-modal-content">
+            <div style="font-size: 2.2rem; color: var(--accent-purple); margin-bottom: 12px;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2 style="font-size: 1.35rem; margin-bottom: 6px;">Admin Dashboard</h2>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 15px;">
+                Enter security PIN (*****) to access control panel.
+            </p>
+            <input type="password" id="pinInput" class="pin-input" placeholder="••••••••" maxlength="32" autofocus>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn btn-secondary" id="pinCloseBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="pinSubmitBtn">Unlock ✦</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Admin Dashboard Modal -->
+    <div class="admin-overlay" id="adminOverlay">
+        <div class="admin-modal">
+            
+            <!-- Admin Header -->
+            <div class="admin-header">
+                <div class="admin-header-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Cosmic Admin Dashboard</span>
+                </div>
+                <button type="button" class="admin-close-btn" id="adminCloseBtn" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="admin-tabs">
+                <button type="button" class="admin-tab active" data-tab="tabPrograms">
+                    <i class="fa-solid fa-shapes"></i> Apps & Software
+                </button>
+                <button type="button" class="admin-tab" data-tab="tabLinks">
+                    <i class="fa-solid fa-link"></i> Website Links
+                </button>
+                <button type="button" class="admin-tab" data-tab="tabProfile">
+                    <i class="fa-solid fa-user-astronaut"></i> Profile & Security
+                </button>
+                <button type="button" class="admin-tab" data-tab="tabBackup">
+                    <i class="fa-solid fa-database"></i> Backup & Restore
+                </button>
+            </div>
+
+            <!-- Admin Body Panels -->
+            <div class="admin-body">
+
+                <!-- Tab 1: Apps & Software Management -->
+                <div class="tab-pane active" id="tabPrograms">
+                    
+                    <!-- Add / Edit App Form -->
+                    <form id="programForm" style="display: flex; flex-direction: column; gap: 14px; background: rgba(255,255,255,0.02); padding: 18px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06);">
+                        <input type="hidden" id="formProgramId">
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="formProgramName">App / Software Name *</label>
+                                <input type="text" id="formProgramName" class="form-input" placeholder="e.g. Photoshop, Telegram, VS Code..." required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="formProgramUrl">App / Website URL *</label>
+                                <input type="url" id="formProgramUrl" class="form-input" placeholder="https://..." required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="formProgramCustomIcon">FontAwesome Icon Class (or select from presets below)</label>
+                            <input type="text" id="formProgramCustomIcon" class="form-input" placeholder="fa-brands fa-telegram">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Popular App Icon Presets (Click to choose):</label>
+                            <div class="icon-selector-grid" id="programIconPresetsContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Glow & Accent Color:</label>
+                            <div class="color-picker-row" id="programColorPresetsContainer">
+                                <!-- Color dots -->
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <button type="submit" class="btn btn-primary" id="formProgramSubmitBtn">
+                                <i class="fa-solid fa-plus"></i> Add App Now
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancelProgramEditBtn" style="display: none;">
+                                Cancel Edit
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Active Apps List -->
+                    <div style="margin-top: 10px;">
+                        <h3 style="font-size: 1.05rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-shapes" style="color: var(--accent-cyan);"></i>
+                            <span>Active Apps (Reorder, edit icon/name, or delete)</span>
+                        </h3>
+                        <div class="admin-links-list" id="adminProgramsList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tab 2: Website Links -->
+                <div class="tab-pane" id="tabLinks">
+                    
+                    <!-- Add / Edit Link Form -->
+                    <form id="linkForm" style="display: flex; flex-direction: column; gap: 14px; background: rgba(255,255,255,0.02); padding: 18px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.06);">
+                        <input type="hidden" id="formLinkId">
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="formTitle">Website Title *</label>
+                                <input type="text" id="formTitle" class="form-input" placeholder="e.g. My Personal Portfolio" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="formUrl">Website URL *</label>
+                                <input type="url" id="formUrl" class="form-input" placeholder="https://example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="formCustomIcon">FontAwesome Icon Class</label>
+                            <input type="text" id="formCustomIcon" class="form-input" placeholder="fa-solid fa-globe">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Popular Icons (Steam, Apps & Web - Click to select):</label>
+                            <div class="icon-selector-grid" id="iconPresetsContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Glow & Accent Color:</label>
+                            <div class="color-picker-row" id="colorPresetsContainer">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="formDesc">Short Description (Optional)</label>
+                            <textarea id="formDesc" class="form-textarea" rows="2" placeholder="Brief tagline or description..."></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <button type="submit" class="btn btn-primary" id="formSubmitBtn">
+                                <i class="fa-solid fa-plus"></i> Add Link
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display: none;">
+                                Cancel Edit
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Active Links List -->
+                    <div style="margin-top: 10px;">
+                        <h3 style="font-size: 1.05rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-layer-group" style="color: var(--accent-cyan);"></i>
+                            <span>Current Links</span>
+                        </h3>
+                        <div class="admin-links-list" id="adminLinksList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tab 3: Profile & Security -->
+                <div class="tab-pane" id="tabProfile">
+                    <form id="profileForm" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="inputProfileName">Display Name</label>
+                                <input type="text" id="inputProfileName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="inputProfileStatus">Status Badge</label>
+                                <input type="text" id="inputProfileStatus" class="form-input" placeholder="e.g. Online ✦ Available for hire">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="inputProfileAvatar">Avatar Image URL</label>
+                            <input type="url" id="inputProfileAvatar" class="form-input" placeholder="https://...">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="inputProfileBio">Biography / Tagline</label>
+                            <textarea id="inputProfileBio" class="form-textarea" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="inputProfilePin">Admin PIN / Password (Leave empty for no password)</label>
+                            <input type="text" id="inputProfilePin" class="form-input" maxlength="32" placeholder="*****">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="align-self: flex-start;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Profile Settings
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tab 4: Backup & Restore -->
+                <div class="tab-pane" id="tabBackup">
+                    <div style="display: flex; flex-direction: column; gap: 18px;">
+                        <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.07);">
+                            <h4 style="margin-bottom: 6px; color: var(--accent-cyan);"><i class="fa-solid fa-file-export"></i> Export Backup (JSON)</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                                Download your entire apps, links, and profile settings as a .json backup file.
+                            </p>
+                            <button type="button" class="btn btn-secondary" id="exportDataBtn">
+                                <i class="fa-solid fa-download"></i> Download Backup File (.json)
+                            </button>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.03); padding: 18px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.07);">
+                            <h4 style="margin-bottom: 6px; color: var(--accent-purple);"><i class="fa-solid fa-file-import"></i> Import Backup (JSON)</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                                Restore your setup from an existing JSON backup file.
+                            </p>
+                            <input type="file" id="importDataInput" accept=".json" style="font-size: 0.85rem; color: var(--text-secondary);">
+                        </div>
+
+                        <div style="background: rgba(239, 68, 68, 0.05); padding: 18px; border-radius: var(--radius-md); border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <h4 style="margin-bottom: 6px; color: #f87171;"><i class="fa-solid fa-rotate-left"></i> Restore Default Settings</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                                Reset your Cosmic Hub back to its original default state.
+                            </p>
+                            <button type="button" class="btn btn-danger" id="resetDataBtn">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Reset to Defaults
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script>
+        function triggerAdminAccess() {
+            if (window.cosmicApp && typeof window.cosmicApp.requestAdminAccess === 'function') {
+                window.cosmicApp.requestAdminAccess();
+            } else {
+                var overlay = document.getElementById('pinOverlay') || document.getElementById('adminOverlay');
+                if (overlay) overlay.classList.add('active');
+                var pin = document.getElementById('pinInput');
+                if (pin) { pin.value = ''; pin.focus(); }
+            }
+        }
+    </script>
+    <script src="stars.js?v=20260923_11"></script>
+    <script src="app.js?v=20260923_11"></script>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
