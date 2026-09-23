@@ -10,7 +10,7 @@
   "programs": [
     {
       "id": "prog-2",
-      "name": "Telegram",
+      "name": "Telegram channel",
       "url": "https://t.me/Tiger_TE",
       "icon": "fa-brands fa-telegram",
       "color": "#a855f7",
