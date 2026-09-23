@@ -313,32 +313,47 @@ class CosmicApp {
                 if (!tokenFallback) throw serverErr;
                 // иначе كمّل للتوكن المحلي
             }
-            // 2) طريقة احتياطية: توكن محفوظ بالمتصفح
+            // 2) طريقة احتياطية: توكن محفوظ بالمتصفح (مع محاولة ثانية عند تعارض 409)
             const token = this.getGitHubToken();
             if (!token) throw new Error('ضيف GITHUB_TOKEN في Vercel أو احفظ توكن بالمتصفح!');
             const apiUrl = `https://api.github.com/repos/${GLOBAL_SYNC.owner}/${GLOBAL_SYNC.repo}/contents/${GLOBAL_SYNC.file}`;
-            // 1) جيب sha الملف الحالي
-            const getRes = await fetch(apiUrl + `?ref=${GLOBAL_SYNC.branch}`, {
-                headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+            const ghHeaders = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' };
+            const doPut = async (sha, attempt) => {
+                const content = JSON.stringify(this.data, null, 2);
+                const base64 = btoa(unescape(encodeURIComponent(content)));
+                const putRes = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: { ...ghHeaders, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'Update site data from admin panel 🌍',
+                        content: base64,
+                        sha,
+                        branch: GLOBAL_SYNC.branch
+                    })
+                });
+                if (putRes.status === 409 && attempt === 1) {
+                    // تعارض: الملف تغير (غالبا نشرت قبل ثواني). جيب sha جديد وحاول مرة ثانية.
+                    const retryGet = await fetch(apiUrl + `?ref=${GLOBAL_SYNC.branch}&t=${Date.now()}`, { headers: ghHeaders, cache: 'no-store' });
+                    if (retryGet.ok) {
+                        const retryCurrent = await retryGet.json();
+                        return doPut(retryCurrent.sha, 2);
+                    }
+                }
+                return putRes;
+            };
+            // 1) جيب sha الملف الحالي (بدون كاش)
+            const getRes = await fetch(apiUrl + `?ref=${GLOBAL_SYNC.branch}&t=${Date.now()}`, {
+                headers: ghHeaders, cache: 'no-store'
             });
             if (!getRes.ok) throw new Error('فشل قراءة الملف من GitHub (' + getRes.status + '). تأكد من التوكن والصلاحيات.');
             const current = await getRes.json();
-            // 2) حدّث المحتوى
-            const content = JSON.stringify(this.data, null, 2);
-            const base64 = btoa(unescape(encodeURIComponent(content)));
-            const putRes = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: 'Update site data from admin panel 🌍',
-                    content: base64,
-                    sha: current.sha,
-                    branch: GLOBAL_SYNC.branch
-                })
-            });
+            const putRes = await doPut(current.sha, 1);
             if (!putRes.ok) {
-                const err = await putRes.text();
-                throw new Error('فشل النشر (' + putRes.status + '): ' + err.slice(0, 200));
+                if (putRes.status === 409) {
+                    await this.loadGlobalData();
+                    throw new Error('تم النشر قبل لحظات! حدّث الصفحة، تعديلك موجود ✅');
+                }
+                throw new Error('فشل النشر (' + putRes.status + '). حاول مرة ثانية.');
             }
             this.updateSyncStatus('published');
             this.showToast('تم النشر للجميع! انتظر 1-2 دقيقة 🌍');

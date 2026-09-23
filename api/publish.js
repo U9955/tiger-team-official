@@ -55,24 +55,39 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'PIN غلط! ما تكدر تنشر.' });
     }
 
-    // 2) انشر المحتوى الجديد
+    // 2) انشر المحتوى الجديد (مع محاولة ثانية عند 409)
     const content = JSON.stringify(data, null, 2);
     const base64 = Buffer.from(content, 'utf8').toString('base64');
 
-    const putRes = await fetch(apiUrl, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify({
-        message: 'Update site data from admin panel 🌍',
-        content: base64,
-        sha: current.sha,
-        branch: BRANCH
-      })
-    });
+    const doPut = async (sha) => {
+      return fetch(apiUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          message: 'Update site data from admin panel 🌍',
+          content: base64,
+          sha,
+          branch: BRANCH
+        })
+      });
+    };
+
+    let putRes = await doPut(current.sha);
+
+    if (putRes.status === 409) {
+      const retryGet = await fetch(apiUrl + `?ref=${BRANCH}&t=${Date.now()}`, { headers, cache: 'no-store' });
+      if (retryGet.ok) {
+        const retryCurrent = await retryGet.json();
+        putRes = await doPut(retryCurrent.sha);
+      }
+    }
 
     if (!putRes.ok) {
+      if (putRes.status === 409) {
+        return res.status(409).json({ error: 'تم النشر قبل لحظات! حدّث الصفحة ✅' });
+      }
       const t = await putRes.text();
-      return res.status(502).json({ error: `فشل النشر (${putRes.status}): ` + t.slice(0, 300) });
+      return res.status(502).json({ error: `فشل النشر (${putRes.status}). حاول مرة ثانية.` });
     }
 
     return res.status(200).json({ ok: true, message: 'Published' });
